@@ -1,11 +1,46 @@
+from dbm import sqlite3
 import cv2
 import numpy as np
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from logic import process_frame
-from database import insert_log
+from database import DB_NAME, DB_NAME, insert_log
 from geo_utils import get_location_details, get_municipal_authority
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Road Condition API (Anti-Spam)")
+app = FastAPI(title="Smart Road Monitoring System API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/get-map-data/")
+def get_map_data():
+    """Fetches all incident locations for the Streamlit Map"""
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row  # Allows accessing columns by name
+    cursor = conn.cursor()
+    
+    # We select only what we need for the map and list
+    cursor.execute("SELECT id, timestamp, priority_level, damage_count, latitude, longitude, filename FROM reports ORDER BY id DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    
+    # Convert database rows to a clean list of dictionaries
+    results = []
+    for row in rows:
+        results.append({
+            "id": row["id"],
+            "timestamp": row["timestamp"],
+            "priority": row["priority_level"],
+            "lat": row["latitude"],
+            "lon": row["longitude"],
+            "damage": row["damage_count"]
+        })
+    return results
 
 @app.post("/report/incident")
 async def report_incident(

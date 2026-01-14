@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/get-map-data/")
+@app.get("/get-map-data")
 def get_map_data():
     """Fetches all incident locations for the Streamlit Map"""
     try:
@@ -48,7 +48,7 @@ def get_map_data():
         print(f"Database error: {e}")
         return []
 
-@app.post("/report/incident")
+@app.post("/report-incident")
 async def report_incident(
     file: UploadFile = File(...),
     latitude: float = Form(...),

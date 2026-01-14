@@ -18,9 +18,9 @@ if not API_BASE_URL and "API_URL" in st.secrets:
 # --- CRITICAL FIX: Endpoint must match api.py exactly ---
 if API_BASE_URL:
     API_BASE_URL = API_BASE_URL.rstrip('/')
-    # UPDATED: Changed from /report-condition/ to /report/incident
-    REPORT_ENDPOINT = f"{API_BASE_URL}/report/incident" 
-    MAP_DATA_ENDPOINT = f"{API_BASE_URL}/get-map-data/"
+    # UPDATED: Changed from /report-condition/ to /report-incident
+    REPORT_ENDPOINT = f"{API_BASE_URL}/report-incident" 
+    MAP_DATA_ENDPOINT = f"{API_BASE_URL}/get-map-data"
 else:
     st.error("🚨 API_URL is missing! Please set it in .env or Streamlit Secrets.")
     st.stop()

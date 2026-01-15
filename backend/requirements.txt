@@ -5,7 +5,4 @@ opencv-python-headless
 pillow
 ultralytics
 geopy
-langgraph
-langchain-google-genai
-langchain-core
 python-dotenv

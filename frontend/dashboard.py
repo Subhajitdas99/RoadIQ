@@ -57,7 +57,7 @@ with tabs[0]:
                 df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
                 df['lon'] = pd.to_numeric(df['lon'], errors='coerce')
                 map_data = df[(df['lat'] != 0) & (df['lon'] != 0)]
-                st.map(map_data, zoom=3) # Kept zoom at 12 for better city view
+                st.map(map_data, zoom=3.5) # Kept zoom at 12 for better city view
                 
                 st.subheader("📋 Incident Log")
                 

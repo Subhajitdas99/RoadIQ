@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 processed_images/
 __pycache__/
 .env
@@ -10,3 +11,86 @@ Report_014141.pdf
 runs
 venv/
 .DS_Store
+=======
+
+---
+
+# ✅ 2) .gitignore (Python + FastAPI + Streamlit)
+
+Create a file named **`.gitignore`** in the root and paste this:
+
+```gitignore
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.pkl
+
+# ========================
+# Virtual Environments
+# ========================
+.venv/
+venv/
+env/
+
+# ========================
+# IDE / Editor
+# ========================
+.vscode/
+.idea/
+*.swp
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Logs
+# ========================
+*.log
+logs/
+
+# ========================
+# Jupyter
+# ========================
+.ipynb_checkpoints/
+
+# ========================
+# Streamlit
+# ========================
+.streamlit/secrets.toml
+
+# ========================
+# Model weights / large files
+# ========================
+models/weights/
+*.pt
+*.onnx
+
+# ========================
+# Data (keep datasets out of git)
+# ========================
+data/raw/
+data/processed/
+data/samples/*.mp4
+data/samples/*.avi
+data/samples/*.mov
+data/samples/*.zip
+
+# ========================
+# Build / Distribution
+# ========================
+build/
+dist/
+*.egg-info/
+
+# ========================
+# Environment variables
+# ========================
+.env
+>>>>>>> 5df7195694665c17ac8151c19bd1772f997cc2ab

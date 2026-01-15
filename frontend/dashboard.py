@@ -57,17 +57,51 @@ with tabs[0]:
                 df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
                 df['lon'] = pd.to_numeric(df['lon'], errors='coerce')
                 map_data = df[(df['lat'] != 0) & (df['lon'] != 0)]
-                st.map(map_data, zoom=10)
+                st.map(map_data, zoom=4)
                 
                 st.subheader("📋 Incident Log")
                 
                 # --- UPDATED TABLE COLUMNS ---
-                # Added 'address' and reordered columns
-                cols_to_show = ['timestamp', 'priority', 'authority', 'address', 'lat', 'lon']
+                # 1. Rename columns for better readability
+                # These keys must match what 'api.py' returns in /get-map-data
+                display_df = df.rename(columns={
+                    "timestamp": "Time",
+                    "priority": "Priority Level",
+                    "authority": "Municipal Authority",
+                    "address": "Incident Location",
+                    "damage": "Damage Detected",
+                    "lat": "Latitude",
+                    "lon": "Longitude"
+                })
                 
-                # Verify columns exist before showing to prevent errors
-                available_cols = [c for c in cols_to_show if c in df.columns]
-                st.dataframe(df[available_cols], use_container_width=True)
+                # 2. Select the columns to display (in order)
+                target_cols = [
+                    "Time", 
+                    "Priority Level", 
+                    "Municipal Authority", 
+                    "Incident Location", 
+                    "Damage Detected", 
+                    "Latitude", 
+                    "Longitude"
+                ]
+                
+                # Filter to ensure we only try to show columns that actually exist
+                available_cols = [c for c in target_cols if c in display_df.columns]
+                
+                # 3. Display the dataframe with formatting
+                st.dataframe(
+                    display_df[available_cols], 
+                    use_container_width=True,
+                    hide_index=True,  # Removes the 0, 1, 2 index column
+                    column_config={
+                        "Time": st.column_config.DatetimeColumn(format="D MMM YYYY, h:mm a"),
+                        "Damage Detected": st.column_config.CheckboxColumn(
+                            "Damage?", default=False
+                        ),
+                        "Incident Location": st.column_config.TextColumn(width="large"),
+                    }
+                )
+
             else:
                 st.info("No incidents reported yet.")
         else:

@@ -84,3 +84,6 @@ dataset/
 *.zip
 *.rar
 *.7z
+
+# YOLO weights
+*.pt

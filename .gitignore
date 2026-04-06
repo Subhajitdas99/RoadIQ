@@ -1,89 +1,60 @@
-
----
-
-# ✅ 2) .gitignore (Python + FastAPI + Streamlit)
-
-Create a file named **`.gitignore`** in the root and paste this:
-
-```gitignore
-# ========================
 # Python
-# ========================
 __pycache__/
 *.py[cod]
 *.pyd
 *.pyo
 *.pkl
 
-# ========================
-# Virtual Environments
-# ========================
+# Virtual environments
 .venv/
 venv/
 env/
 
-# ========================
-# IDE / Editor
-# ========================
+# IDE / editor
 .vscode/
 .idea/
 *.swp
 
-# ========================
 # OS files
-# ========================
 .DS_Store
 Thumbs.db
 
-# ========================
 # Logs
-# ========================
 *.log
 logs/
 
-# ========================
 # Jupyter
-# ========================
 .ipynb_checkpoints/
 
-# ========================
 # Streamlit
-# ========================
 .streamlit/secrets.toml
 
-# ========================
 # Model weights / large files
-# ========================
 models/weights/
 *.pt
 *.onnx
 
-# ========================
-# Data (keep datasets out of git)
-# ========================
+# Generated training / inference outputs
+runs/
+
+# Data
 data/raw/
 data/processed/
 data/samples/*.mp4
 data/samples/*.avi
 data/samples/*.mov
 data/samples/*.zip
+dataset/
 
-# ========================
-# Build / Distribution
-# ========================
+# Build / distribution
 build/
 dist/
 *.egg-info/
 
-# ========================
 # Environment variables
-# ========================
 .env
-# Dataset (Do not upload)
-dataset/
+
+# Archives
 *.zip
 *.rar
 *.7z
-
-# YOLO weights
-*.pt

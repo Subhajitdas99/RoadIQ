@@ -54,6 +54,9 @@ dist/
 # Environment variables
 .env
 
+# Local databases
+*.db
+
 # Archives
 *.zip
 *.rar

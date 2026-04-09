@@ -1,13 +1,11 @@
-# Simple in-memory geo storage (Phase-3.5 MVP)
+from src.db.database import fetch_geo_points
 
-geo_points = []
 
 def add_geo_point(lat, lon, risk):
-    geo_points.append({
-        "lat": lat,
-        "lon": lon,
-        "risk": risk
-    })
+    # Phase 13 stores geo history through incidents in SQLite.
+    # This function remains only as a compatibility shim.
+    return {"lat": lat, "lon": lon, "risk": risk}
 
-def get_geo_points():
-    return geo_points
+
+def get_geo_points(limit: int = 500):
+    return fetch_geo_points(limit=limit)

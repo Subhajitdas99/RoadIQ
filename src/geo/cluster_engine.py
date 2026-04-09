@@ -1,6 +1,17 @@
 from sklearn.cluster import DBSCAN
 import numpy as np
 
+
+def classify_risk_band(risk: float) -> str:
+    if risk >= 80:
+        return "CRITICAL"
+    if risk >= 60:
+        return "HIGH"
+    if risk >= 30:
+        return "MEDIUM"
+    return "LOW"
+
+
 def build_risk_zones(points):
     """
     points = [{lat, lon, risk}]
@@ -32,7 +43,8 @@ def build_risk_zones(points):
             "lat": avg_lat,
             "lon": avg_lon,
             "risk": round(avg_risk, 2),
-            "count": len(cluster_points)
+            "count": len(cluster_points),
+            "risk_band": classify_risk_band(avg_risk),
         })
 
     return zones

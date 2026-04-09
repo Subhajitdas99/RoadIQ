@@ -3,6 +3,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
 from src.inference.detector import run_inference
+from src.inference.model_config import MODEL_OPTIONS
 from src.db.database import (
     fetch_analytics_summary_filtered,
     fetch_damage_type_analytics,
@@ -62,6 +63,7 @@ async def detect(
     file: UploadFile = File(...),
     lat: float = Form(0.0),
     lon: float = Form(0.0),
+    model_key: str = Form("default"),
     response: Response = None,
 ):
 
@@ -89,7 +91,8 @@ async def detect(
     # 🤖 RUN AI INFERENCE
     # ======================================================
     start_time = time.time()
-    detections = run_inference(image_np)
+    inference_result = run_inference(image_np, model_key=model_key)
+    detections = inference_result["detections"]
     inference_time = round(time.time() - start_time, 3)
     damage_type_summary = summarize_damage_types(detections)
 
@@ -190,7 +193,10 @@ async def detect(
     # ======================================================
     if response is not None:
         response.headers["X-System"] = "RoadIQ Geo-AI"
-        response.headers["X-Model-Version"] = "roadIQ-road-damage-v2-ready"
+        response.headers["X-Model-Key"] = inference_result["model_key"]
+        response.headers["X-Model-Label"] = inference_result["model_label"]
+        response.headers["X-Model-Version"] = inference_result["model_version"]
+        response.headers["X-Model-Weights"] = inference_result["weights_path"]
         response.headers["X-Inference-Time"] = f"{inference_time}s"
         response.headers["X-Damage-Types"] = ",".join(sorted(damage_type_summary.keys()))
 
@@ -213,6 +219,9 @@ async def detect(
     return {
         "filename": file.filename,
         "incident_id": incident_id,
+        "model_key": inference_result["model_key"],
+        "model_label": inference_result["model_label"],
+        "model_version": inference_result["model_version"],
         "location": {"lat": lat, "lon": lon},
         "num_detections": len(detections),
         "risk_score": risk_score,
@@ -226,6 +235,19 @@ async def detect(
         "decision": decision,
         "detections": detections,
     }
+
+
+@app.get("/models")
+def available_models():
+    return [
+        {
+            "key": model_key,
+            "label": config["label"],
+            "model_version": config["model_version"],
+            "class_names": config["class_names"],
+        }
+        for model_key, config in MODEL_OPTIONS.items()
+    ]
 
 
 # ======================================================

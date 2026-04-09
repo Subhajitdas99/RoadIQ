@@ -21,6 +21,7 @@ ANALYTICS_TRENDS_URL = "http://127.0.0.1:8000/analytics/trends"
 ANALYTICS_DAMAGE_TYPES_URL = "http://127.0.0.1:8000/analytics/damage-types"
 ANALYTICS_TOP_LOCATIONS_URL = "http://127.0.0.1:8000/analytics/top-risk-locations"
 ANALYTICS_HOTSPOTS_URL = "http://127.0.0.1:8000/analytics/hotspots"
+MODELS_URL = "http://127.0.0.1:8000/models"
 
 STATUS_OPTIONS = [
     "all",
@@ -37,6 +38,10 @@ ANALYTICS_WINDOWS = {
     "All Time": None,
 }
 AUTO_REFRESH_SECONDS = 10
+MODEL_LABELS = {
+    "default": "Default Pothole Model",
+    "three_class": "3-Class Experimental Model",
+}
 
 selected_window_label = st.selectbox(
     "Analytics Window",
@@ -49,6 +54,25 @@ if selected_days is not None:
     analytics_params["days"] = selected_days
 
 st.title("🛰️ RoadIQ Phase-8.5 — Live City Command Center")
+
+available_models = [{"key": key, "label": label} for key, label in MODEL_LABELS.items()]
+try:
+    models_res = requests.get(MODELS_URL, timeout=2)
+    if models_res.status_code == 200:
+        fetched_models = models_res.json()
+        if fetched_models:
+            available_models = fetched_models
+except Exception:
+    pass
+
+model_options = {item["label"]: item["key"] for item in available_models}
+selected_model_label = st.selectbox(
+    "Detection Model",
+    list(model_options.keys()),
+    index=0,
+)
+selected_model_key = model_options[selected_model_label]
+st.caption(f"Active detection model: {selected_model_label}")
 
 # ================================
 # 🌍 LIVE CITY STATUS PANEL
@@ -154,7 +178,7 @@ if uploaded:
                 res = requests.post(
                     BACKEND_URL,
                     files=files,
-                    data={"lat": lat, "lon": lon},
+                    data={"lat": lat, "lon": lon, "model_key": selected_model_key},
                     timeout=60
                 )
 
@@ -179,9 +203,10 @@ if uploaded:
             alert_metric.metric("🚨 Alert Level", data.get("alert_level", "N/A"))
 
             damage_summary = data.get("damage_type_summary", {})
+            model_label = data.get("model_label", selected_model_label)
             if damage_summary:
                 st.caption(
-                    "Damage Types: "
+                    f"Model: {model_label} | Damage Types: "
                     + ", ".join(
                         f"{label}={count}" for label, count in damage_summary.items()
                     )

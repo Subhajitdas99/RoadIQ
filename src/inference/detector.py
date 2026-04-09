@@ -5,20 +5,31 @@ from src.inference.damage_config import (
     DEFAULT_DAMAGE_CONFIG,
     SUPPORTED_DAMAGE_TYPES,
 )
-from src.inference.model_config import resolve_best_model_weights
+from src.inference.model_config import get_model_option, resolve_best_model_weights
 
-# The current weights may still be single-class, but the inference
-# pipeline is now ready for multi-class road-damage models.
-weights_path = resolve_best_model_weights()
-model = YOLO(str(weights_path))
+_loaded_models: dict[str, tuple[YOLO, str]] = {}
 
 
-def run_inference(image_np: np.ndarray):
+def load_model(model_key: str = "default") -> tuple[YOLO, str]:
+    normalized_key = (model_key or "default").strip().lower()
+    weights_path = str(resolve_best_model_weights(normalized_key))
+    cached_model = _loaded_models.get(normalized_key)
+
+    if cached_model and cached_model[1] == weights_path:
+        return cached_model
+
+    model = YOLO(weights_path)
+    _loaded_models[normalized_key] = (model, weights_path)
+    return model, weights_path
+
+
+def run_inference(image_np: np.ndarray, model_key: str = "default"):
     """
     Input: image numpy array (H, W, C)
     Output: list of road-damage detections with severity and priority
     """
-
+    model, weights_path = load_model(model_key)
+    model_option = get_model_option(model_key)
     results = model(image_np)
     detections = []
 
@@ -78,4 +89,10 @@ def run_inference(image_np: np.ndarray):
                 }
             )
 
-    return detections
+    return {
+        "detections": detections,
+        "model_key": (model_key or "default").strip().lower(),
+        "model_label": model_option["label"],
+        "model_version": model_option["model_version"],
+        "weights_path": weights_path,
+    }

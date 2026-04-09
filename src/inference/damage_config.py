@@ -24,6 +24,11 @@ SUPPORTED_DAMAGE_TYPES = {
         "severity_weight": 0.6,
         "color_rgb": (186, 85, 211),
     },
+    "manhole": {
+        "display_name": "Manhole",
+        "severity_weight": 0.45,
+        "color_rgb": (112, 128, 144),
+    },
 }
 
 DEFAULT_DAMAGE_CONFIG = {
